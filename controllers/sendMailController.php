@@ -1,12 +1,9 @@
 <?php
 
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
-use PHPMailer\PHPMailer\SMTP;
-
-require '/PHPMailer/src/Exception.php';
-require '/PHPMailer/src/PHPMailer.php';
-require '/PHPMailer/src/SMTP.php';
+// use PHPMailer\PHPMailer\PHPMailer;
+// use PHPMailer\PHPMailer\Exception;
+// use PHPMailer\PHPMailer\SMTP;
+require "PHPMailer/PHPMailerAutoload.php";
 
 class SendMail
 {
@@ -22,7 +19,7 @@ class SendMail
 
         $mail = new PHPMailer();
         $companyMail = 'YOUR EMAIL';
-        $companyMailPAss = 'YOUR PASS';
+        $companyMailPAss = 'YOUR PASSWORD';
 
 
         if ($dataForm['servicio'] == 'Pintura') {
@@ -38,14 +35,13 @@ class SendMail
 
         try {
 
-            $mail->SMTPDebug = SMTP::DEBUG_SERVER;
             $mail->isSMTP();
-            $mail->Host         = "smtp.gmail.com";
-            $mail->SMTPAuth     = true;
-            $mail->Username     = $companyMail;
-            $mail->Password     = $companyMailPAss;
-            $mail->SMTPSecure   = PHPMailer::ENCRYPTION_STARTTLS;
-            $mail->Port         = 465;
+            $mail->Host = 'smtp.gmail.com';
+            $mail->SMTPAuth = true;
+            $mail->Username = $companyMail;
+            $mail->Password = $companyMailPAss;
+            $mail->SMTPSecure = 'tls';
+            $mail->Port = 465;
 
             $mail->setFrom($companyMail);
             $mail->addAddress($dataForm['correo'], $dataForm['nombre']);
@@ -65,6 +61,10 @@ class SendMail
                 $json = json_encode($dataForm);
                 $f = fopen("../../mail_data.json", "w");
                 fwrite($f, $json);
+                fclose($f);
+
+                $f = fopen("../../error.txt", "w");
+                fwrite($f, $mail->ErrorInfo);
                 fclose($f);
             }
         } catch (Exception $e) {
